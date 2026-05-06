@@ -19,6 +19,31 @@ namespace BookstoreApplication
 
             modelBuilder.Entity<AuthorAward>()
                 .HasKey(aa => new { aa.AuthorId, aa.AwardId });
+
+            modelBuilder.Entity<AuthorAward>()
+                .ToTable("AuthorAwardBridge");
+
+            modelBuilder.Entity<Author>()
+                .Property(a => a.DateOfBirth)
+                .HasColumnName("Birthday");
+
+            modelBuilder.Entity<AuthorAward>()
+                .HasOne(aa => aa.Author)
+                .WithMany(aa => aa.AuthorAwards)
+                .HasForeignKey(aa => aa.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AuthorAward>()
+                .HasOne(aa => aa.Award)
+                .WithMany(aa => aa.AuthorAwards)
+                .HasForeignKey (aa => aa.AwardId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Book>()
+                .HasOne(aa => aa.Publisher)
+                .WithMany(aa => aa.Books)
+                .HasForeignKey(aa => aa.PublisherId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
