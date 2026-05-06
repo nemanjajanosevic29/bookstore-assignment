@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,102 +11,65 @@ namespace BookstoreApplication.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        // GET: api/books
+        private readonly BookRepository _bookRepository;
+        private readonly AuthorRepository _authorRepository;
+        private readonly PublisherRepository _publisherRepository;
+
+        public BooksController(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository)
+        {
+            _bookRepository = bookRepository;
+            _authorRepository = authorRepository;
+            _publisherRepository = publisherRepository;
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(DataStore.Books);
+            return Ok(_bookRepository.GetAll());
         }
 
-        // GET api/books/5
         [HttpGet("{id}")]
         public IActionResult GetOne(int id)
         {
-            var book = DataStore.Books.FirstOrDefault(a => a.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
+            var book = _bookRepository.GetById(id);
+            if (book == null) return NotFound();
             return Ok(book);
         }
 
-        // POST api/books
         [HttpPost]
         public IActionResult Post(Book book)
         {
-            // kreiranje knjige je moguće ako je izabran postojeći autor
-            var author = DataStore.Authors.FirstOrDefault(a => a.Id == book.AuthorId);
-            if (author == null)
-            {
-                return BadRequest();
-            }
+            var author = _authorRepository.GetById(book.AuthorId);
+            if (author == null) return BadRequest();
 
-            // kreiranje knjige je moguće ako je izabran postojeći izdavač
-            var publisher = DataStore.Publishers.FirstOrDefault(a => a.Id == book.PublisherId);
-            if (publisher == null)
-            {
-                return BadRequest();
-            }
+            var publisher = _publisherRepository.GetById(book.PublisherId);
+            if (publisher == null) return BadRequest();
 
-            book.Id = DataStore.GetNewBookId();
-            book.Author = author;
-            book.Publisher = publisher;
-            DataStore.Books.Add(book);
-            return Ok(book);
+            return Ok(_bookRepository.Add(book));
         }
 
-        // PUT api/books/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, Book book)
         {
-            if (id != book.Id)
-            {
-                return BadRequest();
-            }
+            if (id != book.Id) return BadRequest();
 
-            var existingBook = DataStore.Books.FirstOrDefault(a => a.Id == id);
-            if (existingBook == null)
-            {
-                return NotFound();
-            }
+            var existing = _bookRepository.GetById(id);
+            if (existing == null) return NotFound();
 
-            // izmena knjige je moguca ako je izabran postojeći autor
-            var author = DataStore.Authors.FirstOrDefault(a => a.Id == book.AuthorId);
-            if (author == null)
-            {
-                return BadRequest();
-            }
+            var author = _authorRepository.GetById(book.AuthorId);
+            if (author == null) return BadRequest();
 
-            // izmena knjige je moguca ako je izabran postojeći izdavač
-            var publisher = DataStore.Publishers.FirstOrDefault(a => a.Id == book.PublisherId);
-            if (publisher == null)
-            {
-                return BadRequest();
-            }
+            var publisher = _publisherRepository.GetById(book.PublisherId);
+            if (publisher == null) return BadRequest();
 
-            int index = DataStore.Books.IndexOf(existingBook);
-            if (index == -1)
-            {
-                return NotFound();
-
-            }
-
-            book.Author = author;
-            book.Publisher = publisher;
-            DataStore.Books[index] = book;
-            return Ok(book);
+            return Ok(_bookRepository.Update(book));
         }
 
-        // DELETE api/books/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var book = DataStore.Books.FirstOrDefault(a => a.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-            DataStore.Books.Remove(book);
+            var deleted = _bookRepository.Delete(id);
+            if (!deleted) return NotFound();
             return NoContent();
         }
     }
