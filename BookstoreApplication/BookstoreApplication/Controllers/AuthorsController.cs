@@ -1,9 +1,6 @@
-﻿using BookstoreApplication.Data;
-using BookstoreApplication.Models;
+﻿using BookstoreApplication.Models;
 using BookstoreApplication.Repositories;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BookstoreApplication.Controllers
 {
@@ -19,38 +16,38 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_authorRepository.GetAll());
+            return Ok(await _authorRepository.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetOne(int id)
+        public async Task<IActionResult> GetOne(int id)
         {
-            var author = _authorRepository.GetById(id);
+            var author = await _authorRepository.GetByIdAsync(id);
             if (author == null) return NotFound();
             return Ok(author);
         }
 
         [HttpPost]
-        public IActionResult Post(Author author)
+        public async Task<IActionResult> Post(Author author)
         {
-            return Ok(_authorRepository.Add(author));
+            return Ok(await _authorRepository.AddAsync(author));
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Author author)
+        public async Task<IActionResult> Put(int id, Author author)
         {
             if (id != author.Id) return BadRequest();
-            var existing = _authorRepository.GetById(id);
+            var existing = await _authorRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();
-            return Ok(_authorRepository.Update(author));
+            return Ok(await _authorRepository.UpdateAsync(author));
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _authorRepository.Delete(id);
+            var deleted = await _authorRepository.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }

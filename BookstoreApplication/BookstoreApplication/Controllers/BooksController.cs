@@ -1,9 +1,6 @@
-﻿using BookstoreApplication.Data;
-using BookstoreApplication.Models;
+﻿using BookstoreApplication.Models;
 using BookstoreApplication.Repositories;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BookstoreApplication.Controllers
 {
@@ -23,52 +20,52 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_bookRepository.GetAll());
+            return Ok(await _bookRepository.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetOne(int id)
+        public async Task<IActionResult> GetOne(int id)
         {
-            var book = _bookRepository.GetById(id);
+            var book = await _bookRepository.GetByIdAsync(id);
             if (book == null) return NotFound();
             return Ok(book);
         }
 
         [HttpPost]
-        public IActionResult Post(Book book)
+        public async Task<IActionResult> Post(Book book)
         {
-            var author = _authorRepository.GetById(book.AuthorId);
+            var author = await _authorRepository.GetByIdAsync(book.AuthorId);
             if (author == null) return BadRequest();
 
-            var publisher = _publisherRepository.GetById(book.PublisherId);
+            var publisher = await _publisherRepository.GetByIdAsync(book.PublisherId);
             if (publisher == null) return BadRequest();
 
-            return Ok(_bookRepository.Add(book));
+            return Ok(await _bookRepository.AddAsync(book));
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Book book)
+        public async Task<IActionResult> Put(int id, Book book)
         {
             if (id != book.Id) return BadRequest();
 
-            var existing = _bookRepository.GetById(id);
+            var existing = await _bookRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();
 
-            var author = _authorRepository.GetById(book.AuthorId);
+            var author = await _authorRepository.GetByIdAsync(book.AuthorId);
             if (author == null) return BadRequest();
 
-            var publisher = _publisherRepository.GetById(book.PublisherId);
+            var publisher = await _publisherRepository.GetByIdAsync(book.PublisherId);
             if (publisher == null) return BadRequest();
 
-            return Ok(_bookRepository.Update(book));
+            return Ok(await _bookRepository.UpdateAsync(book));
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _bookRepository.Delete(id);
+            var deleted = await _bookRepository.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }

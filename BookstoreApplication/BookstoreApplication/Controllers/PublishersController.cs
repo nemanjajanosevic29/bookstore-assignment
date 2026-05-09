@@ -1,9 +1,6 @@
-﻿using BookstoreApplication.Data;
-using BookstoreApplication.Models;
+﻿using BookstoreApplication.Models;
 using BookstoreApplication.Repositories;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BookstoreApplication.Controllers
 {
@@ -19,38 +16,38 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_publisherRepository.GetAll());
+            return Ok(await _publisherRepository.GetAllAsync());
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetOne(int id)
+        public async Task<IActionResult> GetOne(int id)
         {
-            var publisher = _publisherRepository.GetById(id);
+            var publisher = await _publisherRepository.GetByIdAsync(id);
             if (publisher == null) return NotFound();
             return Ok(publisher);
         }
 
         [HttpPost]
-        public IActionResult Post(Publisher publisher)
+        public async Task<IActionResult> Post(Publisher publisher)
         {
-            return Ok(_publisherRepository.Add(publisher));
+            return Ok(await _publisherRepository.AddAsync(publisher));
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Publisher publisher)
+        public async Task<IActionResult> Put(int id, Publisher publisher)
         {
             if (id != publisher.Id) return BadRequest();
-            var existing = _publisherRepository.GetById(id);
+            var existing = await _publisherRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();
-            return Ok(_publisherRepository.Update(publisher));
+            return Ok(await _publisherRepository.UpdateAsync(publisher));
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _publisherRepository.Delete(id);
+            var deleted = await _publisherRepository.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }
