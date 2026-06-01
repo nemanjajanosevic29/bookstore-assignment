@@ -1,5 +1,5 @@
 ﻿using BookstoreApplication.Models;
-using BookstoreApplication.Repositories;
+using BookstoreApplication.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookstoreApplication.Controllers
@@ -8,27 +8,23 @@ namespace BookstoreApplication.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly BookRepository _bookRepository;
-        private readonly AuthorRepository _authorRepository;
-        private readonly PublisherRepository _publisherRepository;
+        private readonly BookService _bookService;
 
-        public BooksController(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository)
+        public BooksController(BookService bookService)
         {
-            _bookRepository = bookRepository;
-            _authorRepository = authorRepository;
-            _publisherRepository = publisherRepository;
+            _bookService = bookService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _bookRepository.GetAllAsync());
+            return Ok(await _bookService.GetAllAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOne(int id)
         {
-            var book = await _bookRepository.GetByIdAsync(id);
+            var book = await _bookService.GetByIdAsync(id);
             if (book == null) return NotFound();
             return Ok(book);
         }
@@ -36,36 +32,24 @@ namespace BookstoreApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Book book)
         {
-            var author = await _authorRepository.GetByIdAsync(book.AuthorId);
-            if (author == null) return BadRequest();
-
-            var publisher = await _publisherRepository.GetByIdAsync(book.PublisherId);
-            if (publisher == null) return BadRequest();
-
-            return Ok(await _bookRepository.AddAsync(book));
+            var result = await _bookService.AddAsync(book);
+            if (result == null) return BadRequest();
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, Book book)
         {
             if (id != book.Id) return BadRequest();
-
-            var existing = await _bookRepository.GetByIdAsync(id);
-            if (existing == null) return NotFound();
-
-            var author = await _authorRepository.GetByIdAsync(book.AuthorId);
-            if (author == null) return BadRequest();
-
-            var publisher = await _publisherRepository.GetByIdAsync(book.PublisherId);
-            if (publisher == null) return BadRequest();
-
-            return Ok(await _bookRepository.UpdateAsync(book));
+            var result = await _bookService.UpdateAsync(id, book);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _bookRepository.DeleteAsync(id);
+            var deleted = await _bookService.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }
