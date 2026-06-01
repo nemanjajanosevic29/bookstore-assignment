@@ -1,15 +1,15 @@
-﻿using BookstoreApplication.Models;
-using BookstoreApplication.Repositories;
+﻿using BookstoreApplication.Interfaces;
+using BookstoreApplication.Models;
 
 namespace BookstoreApplication.Services
 {
-    public class BookService
+    public class BookService : IBookService
     {
-        private readonly BookRepository _bookRepository;
-        private readonly AuthorRepository _authorRepository;
-        private readonly PublisherRepository _publisherRepository;
+        private readonly IBookRepository _bookRepository;
+        private readonly IAuthorRepository _authorRepository;
+        private readonly IPublisherRepository _publisherRepository;
 
-        public BookService(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository)
+        public BookService(IBookRepository bookRepository, IAuthorRepository authorRepository, IPublisherRepository publisherRepository)
         {
             _bookRepository = bookRepository;
             _authorRepository = authorRepository;

@@ -1,12 +1,11 @@
 using BookstoreApplication;
-using BookstoreApplication.Data;
+using Microsoft.EntityFrameworkCore;
+using BookstoreApplication.Interfaces;
 using BookstoreApplication.Repositories;
 using BookstoreApplication.Services;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -14,7 +13,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS - definicija politike
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -28,25 +26,26 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<AuthorService>();
-builder.Services.AddScoped<PublisherService>();
-builder.Services.AddScoped<BookService>();
-builder.Services.AddScoped<AwardService>();
-builder.Services.AddScoped<AuthorRepository>();
-builder.Services.AddScoped<PublisherRepository>();
-builder.Services.AddScoped<BookRepository>();
-builder.Services.AddScoped<AwardRepository>();
+
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IAwardRepository, AwardRepository>();
+
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IPublisherService, PublisherService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAwardService, AwardService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAll");        
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
