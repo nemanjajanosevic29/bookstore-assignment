@@ -1,4 +1,5 @@
-﻿using BookstoreApplication.Interfaces;
+﻿using BookstoreApplication.Exceptions;
+using BookstoreApplication.Interfaces;
 using BookstoreApplication.Models;
 
 namespace BookstoreApplication.Services
@@ -17,9 +18,12 @@ namespace BookstoreApplication.Services
             return await _publisherRepository.GetAllAsync();
         }
 
-        public async Task<Publisher?> GetByIdAsync(int id)
+        public async Task<Publisher> GetByIdAsync(int id)
         {
-            return await _publisherRepository.GetByIdAsync(id);
+            var publisher = await _publisherRepository.GetByIdAsync(id);
+            if (publisher == null)
+                throw new NotFoundException(id);
+            return publisher;
         }
 
         public async Task<Publisher> AddAsync(Publisher publisher)
@@ -27,15 +31,21 @@ namespace BookstoreApplication.Services
             return await _publisherRepository.AddAsync(publisher);
         }
 
-        public async Task<Publisher?> UpdateAsync(int id, Publisher publisher)
+        public async Task<Publisher> UpdateAsync(int id, Publisher publisher)
         {
+            if (id != publisher.Id)
+                throw new BadRequestException("Identifier value is invalid.");
             var existing = await _publisherRepository.GetByIdAsync(id);
-            if (existing == null) return null;
+            if (existing == null)
+                throw new NotFoundException(id);
             return await _publisherRepository.UpdateAsync(publisher);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
+            var existing = await _publisherRepository.GetByIdAsync(id);
+            if (existing == null)
+                throw new NotFoundException(id);
             return await _publisherRepository.DeleteAsync(id);
         }
     }

@@ -24,9 +24,7 @@ namespace BookstoreApplication.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOne(int id)
         {
-            var author = await _authorService.GetByIdAsync(id);
-            if (author == null) return NotFound();
-            return Ok(author);
+            return Ok(await _authorService.GetByIdAsync(id));
         }
 
         [HttpPost]
@@ -38,17 +36,13 @@ namespace BookstoreApplication.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, Author author)
         {
-            if (id != author.Id) return BadRequest();
-            var result = await _authorService.UpdateAsync(id, author);
-            if (result == null) return NotFound();
-            return Ok(result);
+            return Ok(await _authorService.UpdateAsync(id, author));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _authorService.DeleteAsync(id);
-            if (!deleted) return NotFound();
+            await _authorService.DeleteAsync(id);
             return NoContent();
         }
     }
