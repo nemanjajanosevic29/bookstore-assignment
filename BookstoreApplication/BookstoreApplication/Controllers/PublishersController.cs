@@ -27,6 +27,18 @@ namespace BookstoreApplication.Controllers
             return Ok(await _publisherService.GetByIdAsync(id));
         }
 
+        [HttpGet("sortTypes")]
+        public async Task<IActionResult> GetSortTypes()
+        {
+            return Ok(await _publisherService.GetSortTypes());
+        }
+
+        [HttpGet("sort")]
+        public async Task<IActionResult> GetSortedPublishers([FromQuery] int sortType = (int)PublisherSortType.NAME_ASCENDING)
+        {
+            return Ok(await _publisherService.GetAllSorted(sortType));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(Publisher publisher)
         {

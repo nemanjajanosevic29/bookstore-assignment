@@ -1,6 +1,7 @@
 ﻿using BookstoreApplication.Exceptions;
 using BookstoreApplication.Interfaces;
 using BookstoreApplication.Models;
+using BookstoreApplication.Utils;
 
 namespace BookstoreApplication.Services
 {
@@ -47,6 +48,16 @@ namespace BookstoreApplication.Services
             if (existing == null)
                 throw new NotFoundException(id);
             return await _publisherRepository.DeleteAsync(id);
+        }
+
+        public async Task<IEnumerable<Publisher>> GetAllSorted(int sortType)
+        {
+            return await _publisherRepository.GetAllSorted(sortType);
+        }
+
+        public async Task<List<SortTypeOption>> GetSortTypes()
+        {
+            return await _publisherRepository.GetSortTypes();
         }
     }
 }
