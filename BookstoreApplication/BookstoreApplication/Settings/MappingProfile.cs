@@ -33,6 +33,8 @@ namespace BookstoreApplication.Settings
                     opt => opt.MapFrom(src => src.Publisher.Name)
                 )
                 .ReverseMap();
+
+            CreateMap<Author, AuthorDTO>().ReverseMap();
         }
     }
 }
