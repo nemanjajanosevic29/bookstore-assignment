@@ -1,4 +1,5 @@
 ﻿using BookstoreApplication.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,11 @@ namespace BookstoreApplication
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "1", Name = "Librarian", NormalizedName = "LIBRARIAN" },
+                new IdentityRole { Id = "2", Name = "Editor", NormalizedName = "EDITOR" }
+            );
 
             modelBuilder.Entity<AuthorAward>()
                 .HasKey(aa => new { aa.AuthorId, aa.AwardId });
@@ -37,7 +43,7 @@ namespace BookstoreApplication
             modelBuilder.Entity<AuthorAward>()
                 .HasOne(aa => aa.Award)
                 .WithMany(aa => aa.AuthorAwards)
-                .HasForeignKey (aa => aa.AwardId)
+                .HasForeignKey(aa => aa.AwardId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Book>()

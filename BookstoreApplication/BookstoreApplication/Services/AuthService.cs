@@ -14,7 +14,7 @@ namespace BookstoreApplication.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;   
+        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
         public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IMapper mapper)
@@ -33,6 +33,8 @@ namespace BookstoreApplication.Services
                 string errorMessage = string.Join("; ", result.Errors.Select(e => e.Description));
                 throw new BadRequestException(errorMessage);
             }
+            
+            await _userManager.AddToRoleAsync(user, "Librarian");
         }
 
         public async Task<string> Login(LoginDto data)
@@ -63,15 +65,22 @@ namespace BookstoreApplication.Services
 
         private async Task<string> GenerateJwt(ApplicationUser user)
         {
+            var roles = await _userManager.GetRolesAsync(user);
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim("username", user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim("role", role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],

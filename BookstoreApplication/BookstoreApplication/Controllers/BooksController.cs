@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Interfaces;
 using BookstoreApplication.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookstoreApplication.Controllers
@@ -15,6 +16,7 @@ namespace BookstoreApplication.Controllers
             _bookService = bookService;
         }
 
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,18 +29,21 @@ namespace BookstoreApplication.Controllers
             return Ok(await _bookService.GetByIdAsync(id));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post(Book book)
         {
             return Ok(await _bookService.AddAsync(book));
         }
 
+        [Authorize(Roles = "Editor")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, Book book)
         {
             return Ok(await _bookService.UpdateAsync(id, book));
         }
 
+        [Authorize(Roles = "Editor")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
