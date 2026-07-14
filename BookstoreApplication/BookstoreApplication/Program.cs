@@ -1,4 +1,5 @@
 using BookstoreApplication;
+using BookstoreApplication.Infrastructure;
 using BookstoreApplication.Interfaces;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repositories;
@@ -60,13 +61,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -83,10 +83,18 @@ builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IAwardRepository, AwardRepository>();
 
+builder.Services.AddScoped<IIssueRepository, IssueRepository>();
+
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAwardService, AwardService>();
+
+builder.Services.AddScoped<IVolumeService, VolumeService>();
+builder.Services.AddScoped<IIssueService, IssueService>();
+
+builder.Services.AddScoped<IComicVineConnection, ComicVineConnection>();
+builder.Services.AddHttpClient<ComicVineConnection>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
@@ -111,16 +119,12 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateLifetime = true,
-
         ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-
         ValidateAudience = true,
         ValidAudience = builder.Configuration["Jwt:Audience"],
-
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-
         RoleClaimType = ClaimTypes.Role
     };
 });

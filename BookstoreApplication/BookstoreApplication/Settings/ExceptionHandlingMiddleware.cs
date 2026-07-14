@@ -26,6 +26,7 @@ namespace BookstoreApplication.Settings
             {
                 BadRequestException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
+                ApiCommunicationException => StatusCodes.Status503ServiceUnavailable,
                 _ => StatusCodes.Status500InternalServerError
             };
             var response = new { error = exception.Message };
